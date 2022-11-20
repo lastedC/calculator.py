@@ -56,6 +56,15 @@ class Calculator:
         self.create_operator_buttons()
         self.create_special_buttons()
 
+        self.bind_keys()
+
+    def bind_keys(self):
+        self.window.bind("<Return>", lambda event: self.evaluate())
+        for key in self.digits:
+            self.window.bind(str(key), lambda event, digit=key: self.add_to_expression(digit))
+        for key in self.operations:
+            self.window.bind(str(key), lambda event, operator=key: self.append_operator(operator))
+
     def create_special_buttons(self):
         self.create_clear_button()
         self.create_equals_button()
