@@ -11,6 +11,7 @@ LIGHT_GRAY = "#F5F5F5"
 LABEL_COLOR = "#25265E"
 WHITE = "#FFFFFF"
 OFF_WHITE = "#F8FAFF"
+LIGHT_BLUE = "#CCEDFF"
 
 
 class Calculator:
@@ -22,14 +23,14 @@ class Calculator:
         self.window.title("Calculator")
 
         # Define total expression
-        self.total_expression = "0"
+        self.total_expression = ""
 
         # Define current expression
-        self.current_expression = "0"
+        self.current_expression = ""
 
         self.display_frame = self.create_display_frame()
 
-        self.total_label, self.lable = self.create_display_labels()
+        self.total_label, self.label = self.create_display_labels()
 
         # Creating a dictionary for the numerical buttons
         self.digits = {
@@ -43,7 +44,21 @@ class Calculator:
         self.operations = {"/": "\u00F7", "*": "\u00D7", "-": "-", "+": "+"}
 
         self.buttons_frame = self.create_buttons_frame()
+
+        self.buttons_frame.rowconfigure(0, weight=1)
+
+        for x in range(1, 5):
+            # Expanding the rows and columns to take up the wole window
+            self.buttons_frame.rowconfigure(x, weight=1)
+            self.buttons_frame.columnconfigure(x, weight=1)
+
         self.create_digit_buttons()
+        self.create_operator_buttons()
+        self.create_special_buttons()
+
+    def create_special_buttons(self):
+        self.create_clear_button()
+        self.create_equals_button()
 
     def create_display_labels(self):
         total_label = tk.Label(self.display_frame, text=self.total_expression,
@@ -61,21 +76,58 @@ class Calculator:
         frame.pack(expand=True, fill="both")
         return frame
 
+    def add_to_expression(self, value):
+        self.current_expression += str(value)
+        self.update_label()
+
     def create_digit_buttons(self):
         for digit, grid_value in self.digits.items():
             button = tk.Button(self.buttons_frame, text=str(
-                digit), bg=WHITE, fg=LABEL_COLOR, font=DIGIT_FONT_STYLE, borderwidth=0)
+                digit), bg=WHITE, fg=LABEL_COLOR, font=DIGIT_FONT_STYLE, borderwidth=0, command=lambda x=digit: self.add_to_expression(x))
             button.grid(row=grid_value[0],
                         column=grid_value[1], sticky=tk.NSEW)
 
+    def append_operator(self, operator):
+        self.current_expression += operator
+        self.total_expression += self.current_expression
+        self.current_expression = ""
+        self.update_total_label()
+        self.update_label()
+
     def create_operator_buttons(self):
-        for operator,symbol in self.operations.items():
-            button = tk.Button(self.buttons_frame, text=symbol, bg=OFF_WHITE,fg=LABEL_COLOR,font=DEFAULT_FONT_STYLE,borderwidth=0)
+        i = 0
+        for operator, symbol in self.operations.items():
+            button = tk.Button(self.buttons_frame, text=symbol, bg=OFF_WHITE,
+                               fg=LABEL_COLOR, font=DEFAULT_FONT_STYLE, borderwidth=0, command=lambda x=operator: self.append_operator(x))
+            button.grid(row=i, column=4, sticky=tk.NSEW)
+            i += 1
+
+    def clear(self):
+        self.current_expression = ""
+        self.total_expression = ""
+        self.update_label()
+        self.update_total_label()
+
+    def create_clear_button(self):
+        button = tk.Button(self.buttons_frame, text="C", bg=WHITE,
+                           fg=LABEL_COLOR, font=DIGIT_FONT_STYLE, borderwidth=0, command=self.clear())
+        button.grid(row=0, column=1, sticky=tk.NSEW, columnspan=3)
+
+    def create_equals_button(self):
+        button = tk.Button(self.buttons_frame, text="=", bg=LIGHT_BLUE,
+                           fg=LABEL_COLOR, font=DIGIT_FONT_STYLE, borderwidth=0)
+        button.grid(row=4, column=3, sticky=tk.NSEW, columnspan=2)
 
     def create_buttons_frame(self):
         frame = tk.Frame(self.window)
         frame.pack(expand=True, fill="both")
         return frame
+
+    def update_total_label(self):
+        self.total_label.config(text=self.total_expression)
+
+    def update_label(self):
+        self.label.config(text=self.current_expression)
 
     def run(self):
         self.window.mainloop()
