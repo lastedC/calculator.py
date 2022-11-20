@@ -107,15 +107,25 @@ class Calculator:
         self.total_expression = ""
         self.update_label()
         self.update_total_label()
+        
 
     def create_clear_button(self):
         button = tk.Button(self.buttons_frame, text="C", bg=WHITE,
-                           fg=LABEL_COLOR, font=DIGIT_FONT_STYLE, borderwidth=0, command=self.clear())
+                           fg=LABEL_COLOR, font=DIGIT_FONT_STYLE, borderwidth=0, command=self.clear)
         button.grid(row=0, column=1, sticky=tk.NSEW, columnspan=3)
+
+    def evaluate(self):
+        self.total_expression += self.current_expression
+        self.update_total_label()
+        
+        self.current_expression = str(eval(self.total_expression))
+
+        self.total_expression = ""
+        self.update_label()
 
     def create_equals_button(self):
         button = tk.Button(self.buttons_frame, text="=", bg=LIGHT_BLUE,
-                           fg=LABEL_COLOR, font=DIGIT_FONT_STYLE, borderwidth=0)
+                           fg=LABEL_COLOR, font=DIGIT_FONT_STYLE, borderwidth=0, command=self.evaluate)
         button.grid(row=4, column=3, sticky=tk.NSEW, columnspan=2)
 
     def create_buttons_frame(self):
